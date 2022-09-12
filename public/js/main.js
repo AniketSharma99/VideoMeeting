@@ -5,7 +5,7 @@ const chatToggle = document.querySelector(".vc-chat");
 const chatbox = document.querySelector("#chatbox")
 
 myVideo.muted = true;
-const user = prompt("Enter your name");
+let user = '';
 
 var peer = new Peer()
 
@@ -85,7 +85,15 @@ navigator.mediaDevices
 	})
 
 socket.on('user-disconnected', (userId) => {
-	if (peers[userId]) peers[userId].close()
+	if(peers[userId]) peers[userId].close()
+	else{
+		// location.href = 'https://coaching.mastersunion.org/';
+		
+	  window.location.reload()
+
+	}
+	// console.log(peers)
+
 	console.log("user disconnected :", userId)
 	// alert("-disconnected")
 	// window.location.video ;
@@ -96,17 +104,19 @@ peer.on('open', (id) => {
 	socket.emit('join-room', ROOM_ID, id, user)
 	console.log(id, ROOM_ID)
 })
-
+let video;
 const connectToNewUser = (userId, stream) => {
 	const call = peer.call(userId, stream)
-	const video = document.createElement('video')
+	video = document.createElement('video')
 	call.on('stream', (userVideoStream) => {
 		addVideoStream(video, userVideoStream)
 	})
-	call.on('close', () => {
+	call.on('close', (id) => {
+		console.log(stream)
 		video.remove()
 		console.log("call close :", userId)
 	})
+	
 
 	peers[userId] = call
 }
@@ -119,9 +129,8 @@ const addVideoStream = (video, stream) => {
 	if (video.getAttribute('id') != 'myVideo') {
 		myVideo.style.height = '20vh';
 		myVideo.style.width = '10vw';
-		setInterval(interval,1000);
+		setInterval(interval,500);
 	}
-	console.log(video)
 	videoGrid.append(video)
 }
 
@@ -159,7 +168,7 @@ const setUnmuteButton = () => {
 }
 
 const playStop = () => {
-	console.log('playStop')
+	// console.log('playStop')
 	let enabled = myVideoStream.getVideoTracks()[0].enabled
 	if (enabled) {
 		myVideoStream.getVideoTracks()[0].enabled = false
@@ -187,14 +196,14 @@ const setPlayVideo = () => {
 	document.querySelector('.mainVideoButton').innerHTML = html
 }
 const disconnectCall = () => {
-	console.log("END IS PRESS")
+	// console.log("END IS PRESS")
 	location.href = 'https://coaching.mastersunion.org/';
 };
 
 const interval = () => {
 	if(document.querySelector("#videoGrid").childNodes.length < 3){
 		myVideo.style.height = '70vh';
-		myVideo.style.width = '60vh';
+		myVideo.style.width = '60vw';
 		clearInterval(interval)
 	}
   }
